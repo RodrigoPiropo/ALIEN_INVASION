@@ -8,6 +8,9 @@ class GameStats:
         # Inicia a invasao alienigena em um estado ativo
         self.game_active = True
 
+        # Inicia o jogo em um estado inativo
+        self.game_active = False
+
     def reset_stats(self):
         """Inicializa os dados estatisticos que podem mudar durante o jogo."""
         self.ship_left = self.ai_settings.ship_limit
