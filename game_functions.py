@@ -5,7 +5,7 @@ from alien import Alien
 from time import sleep
 
 
-def check_keydown_events(event, ai_settings, screen, ship, bullets):
+def check_keydown_events(event, ai_settings, stats, screen, ship, aliens, bullets):
     """Responde a pressionamentos de tecla"""
     if event.key == pygame.K_RIGHT:
         ship.moving_right = True
@@ -15,6 +15,8 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
         fire_bullet(ai_settings, screen, ship, bullets)
     elif event.key == pygame.K_q:
         sys.exit()
+    elif event.key == pygame.K_p and not stats.game_active:
+        start_game(ai_settings, screen, stats, ship, aliens, bullets)
 
 
 def fire_bullet(ai_settings, screen, ship, bullets):
@@ -43,7 +45,7 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.KEYDOWN:
-            check_keydown_events(event, ai_settings, screen, ship, bullets)
+            check_keydown_events(event, ai_settings, stats, screen, ship, aliens, bullets)
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -51,23 +53,27 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
             check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
 
+def start_game(ai_settings, screen, stats, ship, aliens, bullets):
+    # Oculta o cursor do mouse
+    pygame.mouse.set_visible(False)
+    # Reinicia os dados estatisticos do jogo
+    stats.reset_stats()
+    stats.game_active = True
+
+    # Esvazia a lista de aliens e de projeteis
+    aliens.empty()
+    bullets.empty()
+
+    # Cria uma nova frota e centraliza a espaçonave
+    create_fleet(ai_settings, screen, ship, aliens)
+    ship.center_ship()
+
+
 def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
     """Inicia um novo jogo quando o jogador clicar em Play"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
-        # Oculta o cursor do mouse
-        pygame.mouse.set_visible(False)
-        # Reinicia os dados estatisticos do jogo
-        stats.reset_stats()
-        stats.game_active = True
-
-        # Esvazia a lista de aliens e de projeteis
-        aliens.empty()
-        bullets.empty()
-
-        # Cria uma nova frota e centraliza a espaçonave
-        create_fleet(ai_settings, screen, ship, aliens)
-        ship.center_ship()
+        start_game(ai_settings, screen, stats, ship, aliens, bullets)
 
 
 def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
@@ -212,5 +218,3 @@ def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
             # Trata esse caso do mesmo modo que é feito quando a espaçonave é atingida
             ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
             break
-
-
