@@ -54,9 +54,13 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
 
 
 def start_game(ai_settings, screen, stats, ship, aliens, bullets):
+    # Reinicia as configurações do jogo
+    ai_settings.initialize_dynamic_settings()
+
     # Oculta o cursor do mouse
     pygame.mouse.set_visible(False)
-    # Reinicia os dados estatisticos do jogo
+
+    # Reinicia as estatisticas do jogo
     stats.reset_stats()
     stats.game_active = True
 
@@ -115,6 +119,7 @@ def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
     if len(aliens) == 0:
         # Destroi os projéteis existentes e cria uma nova frota
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
 
 
