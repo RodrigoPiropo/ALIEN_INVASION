@@ -34,6 +34,9 @@ class Settings:
         # fleet_direction igual a 1 representa a direita, -1 representa a esquerda
         self.fleet_direction = 1
 
+        # Pontuação
+        self.alien_points = 10
+
     def increase_speed(self):
         """Aumenta as configurações de velocidade"""
         self.ship_speed_factor *= self.speedup_scale
