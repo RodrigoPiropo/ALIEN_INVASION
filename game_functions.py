@@ -15,8 +15,6 @@ def check_keydown_events(event, ai_settings, stats, screen, ship, aliens, bullet
         fire_bullet(ai_settings, screen, ship, bullets)
     elif event.key == pygame.K_q:
         sys.exit()
-    elif event.key == pygame.K_p and not stats.game_active:
-        start_game(ai_settings, screen, stats, ship, aliens, bullets)
 
 
 def fire_bullet(ai_settings, screen, ship, bullets):
@@ -39,7 +37,7 @@ def check_keyup_events(event, ship):
         ship.moving_left = False
 
 
-def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets):
+def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
     """Responde a eventos de precionamento de teclas e de mouse"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -50,34 +48,35 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
             check_keyup_events(event, ship)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+            check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
 
-def start_game(ai_settings, screen, stats, ship, aliens, bullets):
-    # Reinicia as configurações do jogo
-    ai_settings.initialize_dynamic_settings()
-
-    # Oculta o cursor do mouse
-    pygame.mouse.set_visible(False)
-
-    # Reinicia as estatisticas do jogo
-    stats.reset_stats()
-    stats.game_active = True
-
-    # Esvazia a lista de aliens e de projeteis
-    aliens.empty()
-    bullets.empty()
-
-    # Cria uma nova frota e centraliza a espaçonave
-    create_fleet(ai_settings, screen, ship, aliens)
-    ship.center_ship()
-
-
-def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y):
     """Inicia um novo jogo quando o jogador clicar em Play"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
-        start_game(ai_settings, screen, stats, ship, aliens, bullets)
+        # Reinicia as configurações do jogo
+        ai_settings.initialize_dynamic_settings()
+
+        # Oculta o cursor do mouse
+        pygame.mouse.set_visible(False)
+
+        # Reinicia as estatisticas do jogo
+        stats.reset_stats()
+        stats.game_active = True
+
+        # Reinicia as imagens do painel de pontuação
+        sb.prep_score()
+        sb.prep_high_score()
+        sb.prep_level()
+
+        # Esvazia a lista de aliens e de projeteis
+        aliens.empty()
+        bullets.empty()
+
+        # Cria uma nova frota e centraliza a espaçonave
+        create_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
 
 
 def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
@@ -124,11 +123,17 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
         for aliens in collisions.values():
             stats.score += ai_settings.alien_points
             sb.prep_score()
+        check_high_score(stats, sb)
 
     if len(aliens) == 0:
-        # Destroi os projéteis existentes e cria uma nova frota
+        # Se a frota toda for destruída, inicia um novo level
         bullets.empty()
         ai_settings.increase_speed()
+
+        # Aumenta o level
+        stats.level += 1
+        sb.prep_level()
+
         create_fleet(ai_settings, screen, ship, aliens)
 
 
@@ -232,3 +237,10 @@ def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
             # Trata esse caso do mesmo modo que é feito quando a espaçonave é atingida
             ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
             break
+
+
+def check_high_score(stats, sb):
+    """Verifica se há uma nova pontuação máxima."""
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()
