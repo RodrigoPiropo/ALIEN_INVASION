@@ -1,5 +1,5 @@
 # ALIEN INVASION
-## Jogo feito com a blibioteca pygame do Python
+## Jogo feito com a biblioteca pygame do Python
 
 <a href="https://www.pygame.org/docs/">DOCUMENTAÇÃO PYGAME</a>
 <p>Livro de refêrencia: Python Crash Course: A Hands-On, Project-Based Introduction to Programming</p>
@@ -8,7 +8,7 @@
 
 ## Como jogar?
 
-1. Instale a blibioteca pygame na sua máquina:
+1. Instale a biblioteca pygame na sua máquina:
 
 ```
 pip install pygame
